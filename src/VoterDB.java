@@ -7,7 +7,7 @@ public class VoterDB {
     private static final Map<String, String> voterMap = new HashMap<>();
 
     static {
-        voterMap.put("alice", "password123");
+        voterMap.put("duwarahan", "123");
         voterMap.put("bob", "qwerty456");
         voterMap.put("charlie", "zxcvbn789");
     }

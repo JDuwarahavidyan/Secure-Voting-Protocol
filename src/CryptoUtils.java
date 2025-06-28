@@ -2,6 +2,7 @@ import javax.crypto.Cipher;
 import javax.crypto.KeyGenerator;
 import javax.crypto.SecretKey;
 import java.security.*;
+import java.security.spec.X509EncodedKeySpec;
 import java.util.Base64;
 
 public class CryptoUtils {
@@ -70,4 +71,12 @@ public class CryptoUtils {
         verifier.update(data);
         return verifier.verify(signature);
     }
+    
+    public static PublicKey decodeRSAPublicKey(String base64Key) throws Exception {
+        byte[] decoded = Base64.getDecoder().decode(base64Key);
+        X509EncodedKeySpec spec = new X509EncodedKeySpec(decoded);
+        KeyFactory keyFactory = KeyFactory.getInstance("RSA");
+        return keyFactory.generatePublic(spec);
+    }
+
 }

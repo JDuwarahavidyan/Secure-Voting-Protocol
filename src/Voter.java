@@ -1,6 +1,7 @@
 import java.security.KeyPair;
 import java.security.PrivateKey;
 import java.security.PublicKey;
+import java.util.Base64;
 
 public class Voter {
 
@@ -10,26 +11,19 @@ public class Voter {
         this.keyPair = CryptoUtils.generateRSAKeyPair();
     }
 
-    public PublicKey getPublicKey() {
+    public PublicKey getVoterPublicKey() {
         return keyPair.getPublic();
     }
 
-    public PrivateKey getPrivateKey() {
+    public PrivateKey getVoterPrivateKey() {
         return keyPair.getPrivate();
     }
 
     /**
-     * Voter decrypts received token.
+     * Verifies the token signature with the Authority's public key.
      */
-    public String decryptToken(byte[] encryptedToken) throws Exception {
-        byte[] decryptedBytes = CryptoUtils.decryptRSA(encryptedToken, getPrivateKey());
-        return new String(decryptedBytes);
-    }
-
-    /**
-     * Voter verifies Authority’s signature.
-     */
-    public boolean verifyTokenSignature(String tokenData, byte[] signature, PublicKey authorityPublicKey) throws Exception {
-        return CryptoUtils.verifySHA256withRSA(tokenData.getBytes(), signature, authorityPublicKey);
+    public boolean verifyToken(String tokenData, String signatureBase64, PublicKey authorityPubKey) throws Exception {
+        byte[] signature = Base64.getDecoder().decode(signatureBase64);
+        return CryptoUtils.verifySHA256withRSA(tokenData.getBytes(), signature, authorityPubKey);
     }
 }
