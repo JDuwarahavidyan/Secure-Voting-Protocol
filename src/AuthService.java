@@ -10,7 +10,7 @@ public class AuthService {
 
         String serverHash = CryptoUtils.hashSHA256(combined);
         
-        System.out.println("Server Hash: " + serverHash);
+        System.out.println("Server Hash (pw + nonce): " + serverHash);
 
         return serverHash.equals(clientHash);
     }

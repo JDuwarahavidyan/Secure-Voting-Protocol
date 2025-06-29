@@ -19,7 +19,7 @@ public class Main {
 
         String combined = password + nonce;
         String clientHash = CryptoUtils.hashSHA256(combined);
-        System.out.println("Client Hash: " + clientHash);
+        System.out.println("Client Hash (pw + nonce): " + clientHash);
 
         boolean authenticated = authService.authenticate(username, nonce, clientHash);
 

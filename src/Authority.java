@@ -117,7 +117,7 @@ public class Authority {
 
                 if (valid) {
                     markTokenAsUsed(incomingTokenData, incomingSignature);
-                    System.out.println("Token verified, fresh, and marked as used.");
+                    System.out.println("Token verified, fresh, and marked as used.\n");
                 }
                 return valid;
             }
@@ -168,16 +168,26 @@ public class Authority {
 
     public void processVote(String hashedVote, String encryptedVoteBase64, String encryptedBundleBase64) throws Exception {
 
-        // Decrypt {K | tokenData}
-        byte[] decryptedBundle = CryptoUtils.decryptRSA(Base64.getDecoder().decode(encryptedBundleBase64), getAuthorityPrivateKey());
+         System.out.println("\n========== Authority: Process Vote ==========");
 
+        // Decrypt {K | tokenData}
+        byte[] decryptedTokenKey = CryptoUtils.decryptRSA(Base64.getDecoder().decode(encryptedBundleBase64), getAuthorityPrivateKey());
+        System.out.println("Decrypted Token + Key with Authority Private Key: " + Base64.getEncoder().encodeToString(decryptedTokenKey) + "\n");
+
+
+        // Extract AES key
         byte[] kBytes = new byte[16];
-        System.arraycopy(decryptedBundle, 0, kBytes, 0, 16);
+        System.arraycopy(decryptedTokenKey, 0, kBytes, 0, 16);
+        String kBase64 = Base64.getEncoder().encodeToString(kBytes);
+        System.out.println("Extracted AES Key: " + kBase64 + "\n");
+
         SecretKey symmetricKey = new SecretKeySpec(kBytes, "AES");
 
-        byte[] tokenBytes = new byte[decryptedBundle.length - 16];
-        System.arraycopy(decryptedBundle, 16, tokenBytes, 0, tokenBytes.length);
+         // Extract tokenData
+        byte[] tokenBytes = new byte[decryptedTokenKey.length - 16];
+        System.arraycopy(decryptedTokenKey, 16, tokenBytes, 0, tokenBytes.length);
         String tokenData = new String(tokenBytes);
+        System.out.println("Extracted TokenData: " + tokenData + "\n");
 
         // Look up token signature in CSV
         String filePath = "issued_tokens.csv";
@@ -200,6 +210,7 @@ public class Authority {
         }
 
         boolean validToken = verifyVoteToken(tokenData, storedSignature);
+        
         if (!validToken) {
             System.out.println("Invalid or expired token!");
             return;
@@ -210,6 +221,12 @@ public class Authority {
         String vote = new String(decryptedVoteBytes);
 
         String recomputedHash = CryptoUtils.hashSHA256(vote);
+
+        System.out.println("Recomputed Hashed Vote: " + recomputedHash);
+        System.out.println("Received Hashed Vote:   " + hashedVote + "\n");
+
+        System.out.println("Decrypted Vote: " + vote + "\n");
+        System.out.println("==========================================");
         if (!recomputedHash.equals(hashedVote)) {
             System.out.println("Vote hash mismatch — possible tampering!");
             return;
