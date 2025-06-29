@@ -38,14 +38,14 @@ public class Authority {
         String tokenData = nonce + "|" + timestamp;
 
         byte[] signature = CryptoUtils.signSHA256withRSA(tokenData.getBytes(), getAuthorityPrivateKey());
-        String signatureBase64 = Base64.getEncoder().encodeToString(signature);
+        String signedToken = Base64.getEncoder().encodeToString(signature);
 
-        saveTokenToCSV(tokenData, signatureBase64);
+        saveTokenToCSV(tokenData, signedToken);
 
         return new String[]{
-                tokenData,
-                signatureBase64,
-                getCertificate()
+            tokenData,
+            signedToken,
+            getCertificate()
         };
     }
 
