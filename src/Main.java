@@ -36,8 +36,8 @@ public class Main {
             String certificate = result[2];
 
             System.out.println("\n=========== Authority sends to Voter ===========");
-            System.out.println("Token Data: " + tokenData);
-            System.out.println("Signed Token: " + signedToken);
+            System.out.println("Token Data: " + tokenData + "\n");
+            System.out.println("Signed Token: " + signedToken + "\n");
             System.out.println("Authority Certificate: " + certificate);
 
             // ==== Voter verifies ====
@@ -64,14 +64,23 @@ public class Main {
 
                     if (vote.equals("Q")) {
                         System.out.println("Exiting voting. Goodbye!");
-                        break; // exit loop and program
+                        break;
                     }
 
                     if (Candidate.isValidChoice(vote)) {
                         String candidateName = Candidate.getCandidateName(vote);
+                        System.out.println("Casting your vote. Please wait...");
+
+                        String[] prepared = voter.prepareVote(candidateName, tokenData, authorityPubKey);
+                        String hashedVote = prepared[0];
+                        String encryptedVote = prepared[1];
+                        String encryptedBundle = prepared[2];
+
+                        authority.processVote(hashedVote, encryptedVote, encryptedBundle);
+                        
                         System.out.println("Your vote for [" + candidateName + "] has been cast!");
                        
-                        break; // valid vote, exit loop
+                        break; 
                     } else {
                         System.out.println("Invalid choice! Please enter A, B, C, D, or Q to quit.");
                     }
